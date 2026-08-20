@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     CONFIG NOTE: search for "Bhai" in the HTML body below and
+     replace with your brother's real name. Also update the
+     "25th" birthday numeral, and personalize the wish-card
+     text inside the .card elements.
+     ========================================================= */
+
+  :root{
+    --navy-dark:   #150b2e;
+    --navy:        #241448;
+    --navy-soft:   #3a2168;
+    --coral:       #ff6b5b;
+    --coral-light: #ffab91;
+    --gold:        #ffc857;
+    --mint:        #ffe9d6;
+    --ink:         #23103a;
+    --shadow: 0 20px 50px rgba(21,11,46,0.5);
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at top, var(--navy-soft) 0%, var(--navy) 45%, var(--navy-dark) 100%);
+    color: var(--mint);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  ::selection{ background: var(--gold); color: var(--navy-dark); }
+
+  .script{ font-family: 'Great Vibes', cursive; }
+  .label{
+    font-family:'Poppins', sans-serif;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  #confetti-canvas{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position: relative;
+    min-height: 100svh;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 6vh 6vw 8vh;
+    isolation: isolate;
+  }
+
+  .hero-frame{
+    position:absolute;
+    inset: clamp(14px, 4vw, 40px);
+    border: 1px solid rgba(255,200,87,0.5);
+    border-radius: 6px;
+    pointer-events:none;
+  }
+  .hero-frame::before, .hero-frame::after{
+    content:"";
+    position:absolute;
+    width: 34px; height: 34px;
+    border: 1px solid var(--gold);
+  }
+  .hero-frame::before{ top:-1px; left:-1px; border-right:none; border-bottom:none; }
+  .hero-frame::after{ bottom:-1px; right:-1px; border-left:none; border-top:none; }
+
+  .poppers{
+    display:flex;
+    gap: clamp(40px, 18vw, 260px);
+    margin-bottom: 0.5rem;
+  }
+  .popper-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+    padding: 8px;
+  }
+  .popper-btn:nth-child(1){ transform: scaleX(-1); animation: sway-flip 3.4s ease-in-out infinite; }
+  .popper-btn:nth-child(2){ animation: sway 3.4s ease-in-out infinite 0.4s; }
+  .popper-btn:focus-visible{ outline: 2px solid var(--gold); outline-offset:4px; border-radius: 8px; }
+
+  @keyframes sway{
+    0%,100%{ transform: rotate(-6deg); }
+    50%{ transform: rotate(4deg); }
+  }
+  @keyframes sway-flip{
+    0%,100%{ transform: scaleX(-1) rotate(-6deg); }
+    50%{ transform: scaleX(-1) rotate(4deg); }
+  }
+
+  .eyebrow{ color: var(--gold); opacity: 0; animation: rise 0.9s ease forwards 0.15s; }
+
+  .numeral{
+    font-family:'Great Vibes', cursive;
+    font-size: clamp(5.5rem, 18vw, 11rem);
+    line-height: 0.85;
+    color: var(--coral);
+    text-shadow: 0 0 40px rgba(255,107,91,0.35);
+    opacity: 0;
+    animation: rise 1s ease forwards 0.3s;
+    position: relative;
+  }
+  .numeral sup{
+    font-family:'Poppins', sans-serif;
+    font-size: 0.16em;
+    letter-spacing: 0.1em;
+    top: -3.4em;
+    color: var(--gold);
+  }
+
+  .headline{
+    font-size: clamp(2.6rem, 7vw, 4.6rem);
+    margin: 0.2em 0 0.35em;
+    color: var(--mint);
+    opacity:0;
+    animation: rise 1s ease forwards 0.5s;
+  }
+  .headline .amp{ color: var(--gold); }
+
+  .names{
+    font-family:'Great Vibes', cursive;
+    font-size: clamp(2.1rem, 6vw, 3.4rem);
+    color: var(--gold);
+    opacity:0;
+    animation: rise 1s ease forwards 0.7s;
+  }
+
+  .subtitle{
+    max-width: 46ch;
+    margin: 1.4rem auto 0;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    font-style: italic;
+    color: var(--coral-light);
+    opacity:0;
+    animation: rise 1s ease forwards 0.9s;
+  }
+
+  .scroll-cue{
+    margin-top: 3rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap: 0.5rem;
+    color: var(--gold);
+    opacity:0;
+    animation: rise 1s ease forwards 1.15s;
+  }
+  .scroll-cue .chevron{
+    width: 14px; height: 14px;
+    border-right: 2px solid var(--coral);
+    border-bottom: 2px solid var(--coral);
+    transform: rotate(45deg);
+    animation: bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob{
+    0%,100%{ transform: translateY(0) rotate(45deg); }
+    50%{ transform: translateY(8px) rotate(45deg); }
+  }
+
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(18px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  /* ---------- WISHES SECTION ---------- */
+  .wishes{
+    position: relative;
+    padding: 6vh 6vw 10vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .wishes-title{
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    margin: 0 0 0.2em;
+    text-align:center;
+  }
+  .wishes-hint{
+    margin: 0 0 3rem;
+    color: var(--coral-light);
+    opacity: 0.85;
+  }
+
+  .deck{
+    position: relative;
+    width: min(88vw, 420px);
+    height: clamp(380px, 55vh, 460px);
+    touch-action: pan-y;
+  }
+
+  .card{
+    position:absolute;
+    inset:0;
+    background: linear-gradient(160deg, var(--mint), #ffdcc2);
+    color: var(--ink);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 2.6rem 2.2rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    border: 1px solid rgba(255,200,87,0.6);
+    cursor: grab;
+    user-select:none;
+    transition: transform 0.45s cubic-bezier(.22,.68,0,1.01), opacity 0.45s ease;
+    will-change: transform;
+  }
+  .card:active{ cursor: grabbing; }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    inset: 10px;
+    border: 1px solid rgba(255,107,91,0.3);
+    border-radius: 12px;
+    pointer-events:none;
+  }
+
+  .card-icon{ font-size: 2rem; margin-bottom: 0.6rem; }
+  .card-title{
+    font-family:'Great Vibes', cursive;
+    font-size: 2.1rem;
+    color: var(--coral);
+    margin: 0 0 0.6rem;
+  }
+  .card-text{
+    font-size: 1.15rem;
+    line-height: 1.55;
+    font-style: italic;
+  }
+  .card-num{
+    position:absolute;
+    bottom: 16px;
+    right: 20px;
+    font-family:'Poppins', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--navy-soft);
+    opacity: 0.6;
+  }
+
+  .deck-controls{
+    display:flex;
+    align-items:center;
+    gap: 1.6rem;
+    margin-top: 2.2rem;
+  }
+  .nav-btn{
+    background: rgba(255,233,214,0.08);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: background 0.25s ease, transform 0.2s ease;
+  }
+  .nav-btn:hover{ background: rgba(255,200,87,0.18); transform: translateY(-2px); }
+  .nav-btn:focus-visible{ outline: 2px solid var(--gold); outline-offset:3px; }
+
+  .dots{ display:flex; gap: 0.5rem; }
+  .dot{
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,171,145,0.35);
+    cursor:pointer;
+    border: none;
+    padding: 0;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  .dot.active{ background: var(--gold); transform: scale(1.3); }
+
+  footer{
+    text-align:center;
+    padding: 4vh 6vw 6vh;
+    color: var(--coral-light);
+  }
+  footer .sign{
+    font-family:'Great Vibes', cursive;
+    font-size: 2.2rem;
+    color: var(--gold);
+    display:block;
+    margin-top: 0.4rem;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
+    .card{ transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+<section class="hero">
+  <div class="hero-frame" aria-hidden="true"></div>
+
+  <div class="poppers">
+    <button class="popper-btn" id="popperLeft" aria-label="Set off party poppers">🎉</button>
+    <button class="popper-btn" id="popperRight" aria-label="Set off party poppers">🎂</button>
+  </div>
+
+  <p class="eyebrow label">A celebration of you</p>
+  <h1 class="numeral">28<sup>th</sup></h1>
+  <h2 class="headline">Happy <span class="amp">Birthday</span></h2>
+  <p class="names script">Nabeegh Bhai</p>
+  <p class="subtitle">Another year of your jokes, your advice, and just being the best big brother anyone could ask for. Today's all about you.</p>
+
+  <div class="scroll-cue">
+    <span class="label">Wishes for you</span>
+    <span class="chevron" aria-hidden="true"></span>
+  </div>
+</section>
+
+<section class="wishes">
+  <h3 class="wishes-title script">With Love, From All of Us</h3>
+  <p class="wishes-hint label">swipe or use the arrows</p>
+
+  <div class="deck" id="deck">
+    <div class="card" data-index="0">
+      <div class="card-icon">🎂</div>
+      <h4 class="card-title">Happy Birthday Nabeegh Bhai!</h4>
+      <p class="card-text">Another year older, another year of you being the same amazing, ridiculous, loveable brother we can't imagine life without.</p>
+      <span class="card-num">01 / 06</span>
+    </div>
+    <div class="card" data-index="1">
+      <div class="card-icon">🏆</div>
+      <h4 class="card-title">Our Role Model</h4>
+      <p class="card-text">You've always led the way and made it look easy. Thank you for every bit of guidance and every time you had my back.</p>
+      <span class="card-num">02 / 06</span>
+    </div>
+    <div class="card" data-index="2">
+      <div class="card-icon">😂</div>
+      <h4 class="card-title">Keeper Of All The Jokes</h4>
+      <p class="card-text">Nobody makes me laugh the way you do. Here's to another year of your terrible puns and even better company.</p>
+      <span class="card-num">03 / 06</span>
+    </div>
+    <div class="card" data-index="3">
+      <div class="card-icon">🎁</div>
+      <h4 class="card-title">Wishing You The World</h4>
+      <p class="card-text">May this year bring you everything you've been working towards, and a few happy surprises along the way too.</p>
+      <span class="card-num">04 / 06</span>
+    </div>
+    <div class="card" data-index="4">
+      <div class="card-icon">💪</div>
+      <h4 class="card-title">Always In Your Corner</h4>
+      <p class="card-text">Whatever this new year brings, know that we're right behind you, cheering you on, just like you've always done for us.</p>
+      <span class="card-num">05 / 06</span>
+    </div>
+    <div class="card" data-index="5">
+      <div class="card-icon">🎉</div>
+      <h4 class="card-title">Happy Birthday!</h4>
+      <p class="card-text">From all of us who love you most &mdash; go make today as great as you are. Cheers to you, Nabeegh Bhai!</p>
+      <span class="card-num">06 / 06</span>
+    </div>
+  </div>
+
+  <div class="deck-controls">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous wish">&#8592;</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-btn" id="nextBtn" aria-label="Next wish">&#8594;</button>
+  </div>
+</section>
+
+<footer>
+  <span class="label">Happy Birthday</span>
+  <span class="sign script">With all our love</span>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- Confetti / Party Popper ---------------- */
+  var canvas = document.getElementById('confetti-canvas');
+  var ctx = canvas.getContext('2d');
+  var pieces = [];
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize(){
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var COLORS = ['#ff6b5b', '#ffc857', '#ffab91', '#ffe9d6', '#7dd8c6', '#3a2168'];
+
+  function burst(originX, originY, count){
+    for (var i = 0; i < count; i++){
+      var angle = (Math.random() * Math.PI) - Math.PI/2 - (originX < window.innerWidth/2 ? -0.5 : 0.5);
+      var speed = 6 + Math.random() * 9;
+      pieces.push({
+        x: originX,
+        y: originY,
+        vx: Math.cos(angle) * speed + (originX < window.innerWidth/2 ? 2 : -2),
+        vy: Math.sin(angle) * speed - 6,
+        size: 5 + Math.random() * 6,
+        color: COLORS[Math.floor(Math.random()*COLORS.length)],
+        rot: Math.random() * Math.PI * 2,
+        vr: (Math.random() - 0.5) * 0.3,
+        shape: Math.random() > 0.5 ? 'rect' : 'circle',
+        life: 0,
+        maxLife: 140 + Math.random() * 60
+      });
+    }
+  }
+
+  var gravity = 0.16;
+  var drag = 0.995;
+  var animating = false;
+
+  function tick(){
+    ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+    var alive = false;
+    for (var i = pieces.length - 1; i >= 0; i--){
+      var p = pieces[i];
+      p.life++;
+      if (p.life > p.maxLife){ pieces.splice(i,1); continue; }
+      alive = true;
+      p.vy += gravity;
+      p.vx *= drag;
+      p.vy *= drag;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+
+      var fade = 1 - Math.max(0, (p.life - p.maxLife*0.75) / (p.maxLife*0.25));
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, fade));
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'rect'){
+        ctx.fillRect(-p.size/2, -p.size/3, p.size, p.size/1.6);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0,0,p.size/2,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    if (alive){
+      requestAnimationFrame(tick);
+    } else {
+      animating = false;
+    }
+  }
+
+  function startAnim(){
+    if (!animating){ animating = true; requestAnimationFrame(tick); }
+  }
+
+  function popAt(el){
+    var rect = el.getBoundingClientRect();
+    burst(rect.left + rect.width/2, rect.top + rect.height/2, reduceMotion ? 18 : 55);
+    startAnim();
+  }
+
+  var leftPopper = document.getElementById('popperLeft');
+  var rightPopper = document.getElementById('popperRight');
+  leftPopper.addEventListener('click', function(){ popAt(leftPopper); });
+  rightPopper.addEventListener('click', function(){ popAt(rightPopper); });
+
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      popAt(leftPopper);
+      popAt(rightPopper);
+    }, 350);
+  });
+
+  /* ---------------- Card Deck / Swipe ---------------- */
+  var deck = document.getElementById('deck');
+  var cards = Array.prototype.slice.call(deck.querySelectorAll('.card'));
+  var dotsWrap = document.getElementById('dots');
+  var current = 0;
+
+  cards.forEach(function(_, i){
+    var dot = document.createElement('button');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Go to wish ' + (i+1));
+    dot.addEventListener('click', function(){ goTo(i); });
+    dotsWrap.appendChild(dot);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.querySelectorAll('.dot'));
+
+  function render(){
+    cards.forEach(function(card, i){
+      var offset = i - current;
+      card.style.zIndex = cards.length - Math.abs(offset);
+      if (offset === 0){
+        card.style.transform = 'translateX(0) scale(1) rotate(0deg)';
+        card.style.opacity = '1';
+        card.style.pointerEvents = 'auto';
+      } else if (offset === 1 || (offset === -(cards.length-1))){
+        card.style.transform = 'translateX(30px) scale(0.94) rotate(3deg)';
+        card.style.opacity = '0.7';
+        card.style.pointerEvents = 'none';
+      } else if (offset === -1 || (offset === cards.length-1)){
+        card.style.transform = 'translateX(-30px) scale(0.94) rotate(-3deg)';
+        card.style.opacity = '0.7';
+        card.style.pointerEvents = 'none';
+      } else {
+        card.style.transform = 'translateX(0) scale(0.85) rotate(0deg)';
+        card.style.opacity = '0';
+        card.style.pointerEvents = 'none';
+      }
+    });
+    dots.forEach(function(d, i){ d.classList.toggle('active', i === current); });
+  }
+
+  function goTo(i){
+    current = (i + cards.length) % cards.length;
+    render();
+  }
+  function next(){ goTo(current + 1); }
+  function prev(){ goTo(current - 1); }
+
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
+
+  /* pointer-based swipe */
+  var startX = 0, startY = 0, dx = 0, dragging = false, activeCard = null;
+
+  function onDown(e){
+    var topCard = cards[current];
+    if (!topCard.contains(e.target) && e.target !== topCard) return;
+    dragging = true;
+    activeCard = topCard;
+    var pt = e.touches ? e.touches[0] : e;
+    startX = pt.clientX;
+    startY = pt.clientY;
+    dx = 0;
+    activeCard.style.transition = 'none';
+  }
+  function onMove(e){
+    if (!dragging || !activeCard) return;
+    var pt = e.touches ? e.touches[0] : e;
+    dx = pt.clientX - startX;
+    var dy = pt.clientY - startY;
+    if (Math.abs(dx) < Math.abs(dy)) return;
+    if (e.cancelable) e.preventDefault();
+    var rot = dx / 20;
+    activeCard.style.transform = 'translateX(' + dx + 'px) rotate(' + rot + 'deg)';
+  }
+  function onUp(){
+    if (!dragging || !activeCard) return;
+    dragging = false;
+    activeCard.style.transition = '';
+    var threshold = 90;
+    if (dx > threshold){ prev(); }
+    else if (dx < -threshold){ next(); }
+    else { render(); }
+    activeCard = null;
+  }
+
+  deck.addEventListener('mousedown', onDown);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+  deck.addEventListener('touchstart', onDown, {passive:true});
+  deck.addEventListener('touchmove', onMove, {passive:false});
+  deck.addEventListener('touchend', onUp);
+
+  render();
+})();
+</script>
+
+</body>
+</html>
